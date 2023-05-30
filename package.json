@@ -1,6 +1,26 @@
 {
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "Developers frequently have to create interfaces that allow non-developers to easily view and interact with information stored in databases.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BadrAlmadhi/employee-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BadrAlmadhi/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/BadrAlmadhi/employee-tracker#readme",
   "dependencies": {
     "inquirer": "^8.2.4",
-    "mysql2": "^3.3.3"
+    "mysql2": "^3.3.3",
+    "nodemon": "^2.0.22"
   }
 }
