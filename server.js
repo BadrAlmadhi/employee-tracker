@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.use(express.urlencoded({ extended: false}));
-app.use(express.json);
+app.use(express.json());
 
 // connecting SQL to Node.js
 const db = mysql.createConnection(
@@ -19,15 +19,23 @@ const db = mysql.createConnection(
 );
 
 db.query('SELECT * FROM department', (err, results)=>{
+if (err){
+    console.log(err);
+    return;
+}
 console.log(results);
 });
 
 db.query('SELECT * FROM role', (err, results)=>{
+    if (err){
+        console.log(err);
+        return;
+    }
     console.log(results);
     });
 
 
-    
+
 app.listen(PORT, ()=>{
 console.log(`Server running on port ${PORT}`);
 });
