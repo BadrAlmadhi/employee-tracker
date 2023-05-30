@@ -1,41 +1,53 @@
-const express = require('express');
-const mysql = require('mysql2');
+// pseudocode 
+// first step create schema file and seeds (done)
+// create connection.js to connect sql to node
+// run the query 
 
-const PORT = process.env.PORT || 3001;
-const app = express();
 
-app.use(express.urlencoded({ extended: false}));
-app.use(express.json());
+const logo = require('asciiart-logo');
+const table = require('console.table');
+const db = require('./db/connection');
+const { default: inquirer } = require('inquirer');
 
-// connecting SQL to Node.js
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: 'root',
-        password: 'Badr@1995',
-        database:  'employee_db'
-    },
-    console.log(`Connected to the employee_db database.`)
-);
+// logo call function 
+init();
 
-db.query('SELECT * FROM department', (err, results)=>{
-if (err){
-    console.log(err);
-    return;
-}
-console.log(results);
-});
+// create logo
+function init() {
+    const logoText = logo({ name: "Employee Manager"}).render();
+    console.log(logoText);
+};
 
-db.query('SELECT * FROM role', (err, results)=>{
-    if (err){
-        console.log(err);
-        return;
-    }
-    console.log(results);
+
+// function selecting all departments table
+const viewAllDepartments = () => {
+    const sql = "SELECT * FROM department;";
+    db.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table(result)
     });
+}
 
 
+// function selecting all role table
+const ViewAllRoles = () => {
+    const sql = 'SELECT * FROM role;';
+    db.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table(result);
+    })
+};
 
-app.listen(PORT, ()=>{
-console.log(`Server running on port ${PORT}`);
-});
+// Function selecting employee table 
+const viewAllEmployee = () => {
+    const sql = 'SELECT * FROM employee;';
+    db.query(sql, (err, result) => {
+        if (err) throw err;
+        console.table(result);
+})
+};
+
+// call functions 
+viewAllDepartments();
+ViewAllRoles();
+viewAllEmployee();
