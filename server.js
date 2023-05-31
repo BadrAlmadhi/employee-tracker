@@ -7,7 +7,7 @@
 const logo = require('asciiart-logo');
 const table = require('console.table');
 const db = require('./db/connection');
-const { default: inquirer } = require('inquirer');
+const inquirer = require('inquirer');
 
 // logo call function 
 init();
@@ -18,6 +18,27 @@ function init() {
     console.log(logoText);
 };
 
+const questions = () => {
+    inquirer.prompt([{
+        type: 'list', 
+        name: 'prompt',
+        message: 'What would you like to do?',
+        choices: ['View All Employee', 'Add Employee', 'Update Employee Role', 'View All Roles', 
+        'Add Role', 'View All Departments', 'Add Department']
+    }]).then((answers) => {
+        if (answers.prompt === 'View All Employee') {
+          
+            viewAllEmployee();  
+        } else if (answers.prompt === 'View All Roles') {
+            ViewAllRoles();
+        } else if (answers.prompt === 'View All Departments'){
+            viewAllDepartments();
+        } else if (answers.prompt === 'Add Employee') {
+
+        }
+
+    });
+}
 
 // function selecting all departments table
 const viewAllDepartments = () => {
@@ -25,6 +46,7 @@ const viewAllDepartments = () => {
     db.query(sql, (err, result) => {
         if (err) throw err;
         console.table(result)
+        questions();
     });
 }
 
@@ -47,7 +69,12 @@ const viewAllEmployee = () => {
 })
 };
 
-// call functions 
-viewAllDepartments();
-ViewAllRoles();
-viewAllEmployee();
+// Add employee
+const addDepartment = () => {
+    const sql = 'INSERT INTO department (name) VALUES (?)', [answers.department], (err, result) => {
+        
+    }
+}
+
+
+questions();
