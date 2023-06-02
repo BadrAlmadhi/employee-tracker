@@ -9,6 +9,13 @@ const table = require('console.table');
 const db = require('./db/connection');
 const inquirer = require('inquirer');
 
+
+// order of exsecustion 
+db.connect(() => questions());
+
+// multi asecrenece
+
+
 // logo call function 
 init();
 
@@ -23,20 +30,93 @@ const questions = () => {
         type: 'list', 
         name: 'prompt',
         message: 'What would you like to do?',
-        choices: ['View All Employee', 'Add Employee', 'Update Employee Role', 'View All Roles', 
-        'Add Role', 'View All Departments', 'Add Department']
+        choices: [
+            "View all departments", // Done
+            "View all roles", // Done
+            "View all employees", // Done
+            "Add a department", // Done
+            "Add a role", // Done
+            "Add an employee", // working in it
+            "Update an employee role",
+            "Update an employee's manager",
+            "View employees by manager",
+            "View employees by department",
+            "Remove a department",
+            "Remove a role",
+            "Remove an employee",
+            "Exit"
+        ]
     }]).then((answers) => {
-        if (answers.prompt === 'View All Employee') {
-          
+        if (answers.prompt === 'View all employees') {
             viewAllEmployee();  
-        } else if (answers.prompt === 'View All Roles') {
+        } else if (answers.prompt === 'View all roles') {
             ViewAllRoles();
-        } else if (answers.prompt === 'View All Departments'){
+        } else if (answers.prompt === 'View all departments'){
             viewAllDepartments();
-        } else if (answers.prompt === 'Add Employee') {
-
+        } else if (answers.prompt === 'Add a department') {
+            inquirer.prompt([{
+                type: 'input',
+                name: 'department',
+                message: 'What is the name of the department?',
+                validate: departmentInput => {
+                    if (departmentInput) {
+                        return true;
+                    } else {
+                        consols.log('Please Add a department name')
+                        return false;
+                    }
+                }
+            }]).then((dep) => {
+                addDepartment(dep);
+            })
+        } else if (answers.prompt === 'Add a role') {
+            db.query('SELECT * FROM department', (err, result) => {
+                // map in the array of objects, to create a new array of objects. 
+                const departmentChoices = result.map(({id, department_name})=>({
+                    name: department_name,
+                    value: id
+                }));
+                inquirer.prompt([{
+                    type: 'input',
+                    name: 'title',
+                    message: 'What is the name of the role?',
+                    validate: roleInput => {
+                        if (roleInput) {
+                            return true;
+                        } else {
+                            console.log('Please add a role name');
+                            return false;
+                        }
+                    }
+                },
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'What is the department name of the role?',
+                    choices: departmentChoices
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'What is the salary of the role?',
+                    validate: roleInput => {
+                        if (roleInput) {
+                            return true;
+                        } else {
+                            console.log('Please add a role name');
+                            return false;
+                        }
+                    }
+                }]).then((rol) => {
+                    console.log(rol)
+                    addRole(rol);
+                })
+            })
+            
+        } else if (answers.prompt === 'Add an employee'){
+            // add map and departemnt choices
         }
-
+// add the role is the same 
     });
 }
 
@@ -57,6 +137,7 @@ const ViewAllRoles = () => {
     db.query(sql, (err, result) => {
         if (err) throw err;
         console.table(result);
+        questions();
     })
 };
 
@@ -66,15 +147,40 @@ const viewAllEmployee = () => {
     db.query(sql, (err, result) => {
         if (err) throw err;
         console.table(result);
+        questions();
 })
 };
 
-// Add employee
-const addDepartment = () => {
-    const sql = 'INSERT INTO department (name) VALUES (?)', [answers.department], (err, result) => {
-        
-    }
+// Add department
+const addDepartment = (dep) => {
+    const sql = `INSERT INTO department (department_name) VALUES (?);`;
+    db.query(sql, [dep.department], (err, result) => {
+        if (err) throw err;
+        viewAllDepartments();
+    });
 }
 
+// add role 
+const addRole = (rol) => {
+    // parseInt turn string into a number
+    const params = [rol.title, rol.department, parseInt(rol.salary)];
+    const sql = `INSERT INTO role (role_title, department_id, role_salary) VALUES (?, ?, ?);`;
+    db.query(sql, params, (err, result) => {
+        if (err) throw err;
+        ViewAllRoles();
+    });
+}
 
-questions();
+// // add employee
+const addEmployee = (emp) => {
+  const params = [emp.first_name, emp.last_name, parseInt(emp.role_id), parseInt(emp.manager_id)];
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`;
+  db.query(sql, params, (err, result) => {
+    if (err) throw err;
+    console.table(result);
+    questions();
+  });;
+}
+
+// review Acencrence 
+// update SQL statement set 
