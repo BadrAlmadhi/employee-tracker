@@ -114,7 +114,47 @@ const questions = () => {
             })
             
         } else if (answers.prompt === 'Add an employee'){
-            // add map and departemnt choices
+            db.query(`SELECT * FROM department`, (err, result => {
+                const departmentChoices = result.map(({id, department_name})=>({
+                    name: department_name,
+                    value: id
+                }));
+                inquirer.prompt([{
+                    type: 'input',
+                    name: 'first_name',
+                    message: 'What is the employee first name?',
+                    validate: employeeFirstName => {
+                        if (employeeFirstName) {
+                            return true
+                        } else {
+                            console.log("Please inter employee's first name");
+                            return false;
+                        }
+                    }
+
+                },
+                {
+                    type: 'input',
+                    name: 'last_name',
+                    message: 'What is the employee last name?',
+                    validate: employeeLastName => {
+                        if (employeeLastName) {
+                            return true;
+                        } else {
+                            console.log("Please enter employee's last name");
+                            return false;
+                        }
+                    }
+                },
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'What is the employee role?',
+                    
+
+                }
+            ])
+            }))
         }
 // add the role is the same 
     });
