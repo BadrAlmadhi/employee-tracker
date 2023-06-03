@@ -111,11 +111,11 @@ const questions = () => {
                     console.log(rol)
                     addRole(rol);
                 })
-            })
+            });
             
-        } else if (answers.prompt === 'Add an employee'){
-            db.query(`SELECT * FROM department`, (err, result => {
-                const departmentChoices = result.map(({id, department_name})=>({
+        } else if (answers.prompt === 'Add an employee') {
+            db.query(`SELECT * FROM role`, (err, result) => {
+                const roleChoices = result.map(({id, department_name})=>({
                     name: department_name,
                     value: id
                 }));
@@ -150,13 +150,11 @@ const questions = () => {
                     type: 'list',
                     name: 'department',
                     message: 'What is the employee role?',
-                    
+                    choices: departmentChoices
 
-                }
-            ])
-            }))
+                }])
+            })
         }
-// add the role is the same 
     });
 }
 
