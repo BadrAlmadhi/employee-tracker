@@ -115,9 +115,9 @@ const questions = () => {
             
         } else if (answers.prompt === 'Add an employee') {
             db.query(`SELECT * FROM role`, (err, result) => {
-                const roleChoices = result.map(({id, department_name})=>({
-                    name: department_name,
-                    value: id
+                const roleChoices = result.map(({role_title, department_id, role_salary})=>({
+                    name: role_title,
+                    value: department_id
                 }));
                 inquirer.prompt([{
                     type: 'input',
@@ -150,10 +150,13 @@ const questions = () => {
                     type: 'list',
                     name: 'department',
                     message: 'What is the employee role?',
-                    choices: departmentChoices
+                    choices: roleChoices
 
                 }])
-            })
+            }).then((emp) => {
+                console.log(emp)
+                addEmployee(emp);
+            });
         }
     });
 }
