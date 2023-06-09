@@ -21,13 +21,13 @@ init();
 
 // create logo
 function init() {
-    const logoText = logo({ name: "Employee Manager"}).render();
+    const logoText = logo({ name: "Employee Manager" }).render();
     console.log(logoText);
 };
 
 const questions = () => {
     inquirer.prompt([{
-        type: 'list', 
+        type: 'list',
         name: 'prompt',
         message: 'What would you like to do?',
         choices: [
@@ -37,22 +37,26 @@ const questions = () => {
             "Add a department", // Done
             "Add a role", // Done
             "Add an employee", // working in it
-            "Update an employee role",
-            "Update an employee's manager",
-            "View employees by manager",
-            "View employees by department",
-            "Remove a department",
-            "Remove a role",
-            "Remove an employee",
+            // "Update an employee role",
+            // "Update an employee's manager",
+            // "View employees by manager",
+            // "View employees by department",
+            // "Remove a department",
+            // "Remove a role",
+            // "Remove an employee",
             "Exit"
         ]
     }]).then((answers) => {
+        // this view all employees
         if (answers.prompt === 'View all employees') {
-            viewAllEmployee();  
+            viewAllEmployee();
+            // view all roles
         } else if (answers.prompt === 'View all roles') {
             ViewAllRoles();
-        } else if (answers.prompt === 'View all departments'){
+            // view all departments
+        } else if (answers.prompt === 'View all departments') {
             viewAllDepartments();
+            // adding department
         } else if (answers.prompt === 'Add a department') {
             inquirer.prompt([{
                 type: 'input',
@@ -69,10 +73,11 @@ const questions = () => {
             }]).then((dep) => {
                 addDepartment(dep);
             })
+            // Add a role
         } else if (answers.prompt === 'Add a role') {
             db.query('SELECT * FROM department', (err, result) => {
                 // map in the array of objects, to create a new array of objects. 
-                const departmentChoices = result.map(({id, department_name})=>({
+                const departmentChoices = result.map(({ id, department_name }) => ({
                     name: department_name,
                     value: id
                 }));
@@ -112,51 +117,71 @@ const questions = () => {
                     addRole(rol);
                 })
             });
-            
+
+            // adding employee
+            // (1) what is employee first name 
+            // (2) last name
+            // (3) options of role
+            // (4) option of managers
+            // (5) 
         } else if (answers.prompt === 'Add an employee') {
             db.query(`SELECT * FROM role`, (err, result) => {
-                const roleChoices = result.map(({role_title, department_id, role_salary})=>({
+                const roleChoices = result.map(({ id, role_title }) => ({
                     name: role_title,
-                    value: department_id
+                    value: id
                 }));
-                inquirer.prompt([{
-                    type: 'input',
-                    name: 'first_name',
-                    message: 'What is the employee first name?',
-                    validate: employeeFirstName => {
-                        if (employeeFirstName) {
-                            return true
-                        } else {
-                            console.log("Please inter employee's first name");
-                            return false;
+                db.query(`SELECT * FROM employee`, (err, result) => {
+                    const employeeChoice = result.map(({ id, first_name, last_name }) => ({
+                        name: first_name + ' ' + last_name,
+                        value: id
+                    }));
+                    inquirer.prompt([{
+                        type: 'input',
+                        name: 'first_name',
+                        message: 'What is the employee first name?',
+                        validate: employeeFirstName => {
+                            if (employeeFirstName) {
+                                return true
+                            } else {
+                                console.log("Please inter employee's first name");
+                                return false;
+                            }
                         }
-                    }
 
-                },
-                {
-                    type: 'input',
-                    name: 'last_name',
-                    message: 'What is the employee last name?',
-                    validate: employeeLastName => {
-                        if (employeeLastName) {
-                            return true;
-                        } else {
-                            console.log("Please enter employee's last name");
-                            return false;
+                    },
+                    {
+                        type: 'input',
+                        name: 'last_name',
+                        message: 'What is the employee last name?',
+                        validate: employeeLastName => {
+                            if (employeeLastName) {
+                                return true;
+                            } else {
+                                console.log("Please enter employee's last name");
+                                return false;
+                            }
                         }
-                    }
-                },
-                {
-                    type: 'list',
-                    name: 'department',
-                    message: 'What is the employee role?',
-                    choices: roleChoices
+                    },
+                    {
+                        type: 'list',
+                        name: 'role_id',
+                        message: 'What is the employee role?',
+                        choices: roleChoices
 
-                }])
-            }).then((emp) => {
-                console.log(emp)
-                addEmployee(emp);
-            });
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager_id',
+                        message: 'What is the employee manager?',
+                        choices: employeeChoice
+
+                    }]).then((emp) => {
+                        console.log(emp)
+                        addEmployee(emp);
+                    });
+
+                });
+            })
         }
     });
 }
@@ -189,7 +214,7 @@ const viewAllEmployee = () => {
         if (err) throw err;
         console.table(result);
         questions();
-})
+    })
 };
 
 // Add department
@@ -214,14 +239,13 @@ const addRole = (rol) => {
 
 // // add employee
 const addEmployee = (emp) => {
-  const params = [emp.first_name, emp.last_name, parseInt(emp.role_id), parseInt(emp.manager_id)];
-  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`;
-  db.query(sql, params, (err, result) => {
-    if (err) throw err;
-    console.table(result);
-    questions();
-  });;
+    const params = [emp.first_name, emp.last_name, parseInt(emp.role_id), parseInt(emp.manager_id)];
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`;
+    db.query(sql, params, (err, result) => {
+        if (err) throw err;
+        viewAllEmployee();
+    });;
 }
 
-// review Acencrence 
+// review Acencrence
 // update SQL statement set 
